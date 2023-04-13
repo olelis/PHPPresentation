@@ -32,7 +32,7 @@ class PlotArea implements ComparableInterface
     /**
      * Type.
      *
-     * @var AbstractType|null
+     * @var AbstractType[]|null
      */
     private $type;
 
@@ -99,12 +99,41 @@ class PlotArea implements ComparableInterface
             throw new UndefinedChartTypeException();
         }
 
+        return $this->type[0];
+    }
+
+    /**
+     * @return AbstractType[]
+     * @throws UndefinedChartTypeException
+     */
+    public function getTypes(): array
+    {
+        if (is_null($this->type)) {
+            throw new UndefinedChartTypeException();
+        }
+
         return $this->type;
+
     }
 
     public function setType(AbstractType $value): self
     {
-        $this->type = $value;
+        $this->addType($value);
+
+        return $this;
+    }
+
+
+    // PAL - add method addType()
+    public function addType(Type\AbstractType $value): self
+    {
+        if ($this->type === null) {
+            $this->type = [];
+        }
+        if (!is_array($this->type)) {
+            $this->type = [$this->type];
+        }
+        $this->type[] = $value;
 
         return $this;
     }
@@ -208,7 +237,7 @@ class PlotArea implements ComparableInterface
      */
     public function getHashCode(): string
     {
-        return md5((is_null($this->type) ? 'null' : $this->type->getHashCode()) . $this->axisX->getHashCode() . $this->axisY->getHashCode() . $this->offsetX . $this->offsetY . $this->width . $this->height . __CLASS__);
+        return md5((is_null($this->type) ? 'null' : $this->type[0]->getHashCode()) . $this->axisX->getHashCode() . $this->axisY->getHashCode() . $this->offsetX . $this->offsetY . $this->width . $this->height . __CLASS__);
     }
 
     /**

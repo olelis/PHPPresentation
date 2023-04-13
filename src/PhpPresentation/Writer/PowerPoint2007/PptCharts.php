@@ -255,25 +255,27 @@ class PptCharts extends AbstractDecoratorWriter
 
         // Write series
         $seriesIndex = 0;
-        foreach ($chart->getPlotArea()->getType()->getSeries() as $series) {
-            // Title
-            $sheet->setCellValueByColumnAndRow(1 + $seriesIndex, 1, $series->getTitle());
+        foreach ($chart->getPlotArea()->getTypes() as $type) {
+            foreach ($type->getSeries() as $series) {
+                // Title
+                $sheet->setCellValueByColumnAndRow(1 + $seriesIndex, 1, $series->getTitle());
 
-            // X-axis
-            $axisXData = array_keys($series->getValues());
-            $numAxisXData = count($axisXData);
-            for ($i = 0; $i < $numAxisXData; ++$i) {
-                $sheet->setCellValueByColumnAndRow(0, $i + 2, $axisXData[$i]);
+                // X-axis
+                $axisXData = array_keys($series->getValues());
+                $numAxisXData = count($axisXData);
+                for ($i = 0; $i < $numAxisXData; ++$i) {
+                    $sheet->setCellValueByColumnAndRow(0, $i + 2, $axisXData[$i]);
+                }
+
+                // Y-axis
+                $axisYData = array_values($series->getValues());
+                $numAxisYData = count($axisYData);
+                for ($i = 0; $i < $numAxisYData; ++$i) {
+                    $sheet->setCellValueByColumnAndRow(1 + $seriesIndex, $i + 2, $axisYData[$i]);
+                }
+
+                ++$seriesIndex;
             }
-
-            // Y-axis
-            $axisYData = array_values($series->getValues());
-            $numAxisYData = count($axisYData);
-            for ($i = 0; $i < $numAxisYData; ++$i) {
-                $sheet->setCellValueByColumnAndRow(1 + $seriesIndex, $i + 2, $axisYData[$i]);
-            }
-
-            ++$seriesIndex;
         }
 
         // Save to string
@@ -505,30 +507,33 @@ class PptCharts extends AbstractDecoratorWriter
         // Write layout
         $this->writeLayout($objWriter, $subject);
 
+        $seriesIndex=0;
         // Write chart
-        $chartType = $subject->getType();
-        if ($chartType instanceof Area) {
-            $this->writeTypeArea($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Bar) {
-            $this->writeTypeBar($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Bar3D) {
-            $this->writeTypeBar3D($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Doughnut) {
-            $this->writeTypeDoughnut($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Pie) {
-            $this->writeTypePie($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Pie3D) {
-            $this->writeTypePie3D($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Line) {
-            $this->writeTypeLine($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Radar) {
-            $this->writeTypeRadar($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } elseif ($chartType instanceof Scatter) {
-            $this->writeTypeScatter($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        } else {
-            throw new UndefinedChartTypeException();
-        }
+        foreach ($subject->getTypes() as $chartType) {
+            if ($chartType instanceof Area) {
+                $this->writeTypeArea($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Bar) {
+                $this->writeTypeBar($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Bar3D) {
+                $this->writeTypeBar3D($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Doughnut) {
+                $this->writeTypeDoughnut($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Pie) {
+                $this->writeTypePie($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Pie3D) {
+                $this->writeTypePie3D($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Line) {
+                $this->writeTypeLine($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Radar) {
+                $this->writeTypeRadar($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } elseif ($chartType instanceof Scatter) {
+                $this->writeTypeScatter($objWriter, $chartType, $chart->hasIncludedSpreadsheet(),$seriesIndex);
+            } else {
+                throw new UndefinedChartTypeException();
+            }
 
+        }
+        $chartType = $subject->getType();
         // Write X axis?
         if ($chartType->hasAxisX()) {
             $this->writeAxis($objWriter, $subject->getAxisX(), Chart\Axis::AXIS_X, $chartType);
@@ -538,7 +543,6 @@ class PptCharts extends AbstractDecoratorWriter
         if ($chartType->hasAxisY()) {
             $this->writeAxis($objWriter, $subject->getAxisY(), Chart\Axis::AXIS_Y, $chartType);
         }
-
         $objWriter->endElement();
     }
 
@@ -699,10 +703,11 @@ class PptCharts extends AbstractDecoratorWriter
      * Write Type Area.
      *
      * @param XMLWriter $objWriter XML Writer
-     * @param Chart\Type\Area $subject
+     * @param Area $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeArea(XMLWriter $objWriter, Area $subject, bool $includeSheet = false): void
+    protected function writeTypeArea(XMLWriter $objWriter, Area $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:lineChart
         $objWriter->startElement('c:areaChart');
@@ -713,7 +718,6 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -801,10 +805,11 @@ class PptCharts extends AbstractDecoratorWriter
      * Write Type Bar.
      *
      * @param XMLWriter $objWriter XML Writer
-     * @param Chart\Type\Bar $subject
+     * @param Bar $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeBar(XMLWriter $objWriter, Bar $subject, bool $includeSheet = false): void
+    protected function writeTypeBar(XMLWriter $objWriter, Bar $subject, bool $includeSheet = false,&$seriesIndex=0): void
     {
         // c:barChart
         $objWriter->startElement('c:barChart');
@@ -820,7 +825,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1013,10 +1018,11 @@ class PptCharts extends AbstractDecoratorWriter
      * Write Type Bar3D.
      *
      * @param XMLWriter $objWriter XML Writer
-     * @param Chart\Type\Bar3D $subject
+     * @param Bar3D $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeBar3D(XMLWriter $objWriter, Bar3D $subject, bool $includeSheet = false): void
+    protected function writeTypeBar3D(XMLWriter $objWriter, Bar3D $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:bar3DChart
         $objWriter->startElement('c:bar3DChart');
@@ -1032,7 +1038,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1208,8 +1214,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter XML Writer
      * @param Doughnut $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeDoughnut(XMLWriter $objWriter, Doughnut $subject, bool $includeSheet = false): void
+    protected function writeTypeDoughnut(XMLWriter $objWriter, Doughnut $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:pieChart
         $objWriter->startElement('c:doughnutChart');
@@ -1220,7 +1227,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1367,8 +1374,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter XML Writer
      * @param Pie $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypePie(XMLWriter $objWriter, Pie $subject, bool $includeSheet = false): void
+    protected function writeTypePie(XMLWriter $objWriter, Pie $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:pieChart
         $objWriter->startElement('c:pieChart');
@@ -1379,7 +1387,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1532,8 +1540,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter XML Writer
      * @param Pie3D $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypePie3D(XMLWriter $objWriter, Pie3D $subject, bool $includeSheet = false): void
+    protected function writeTypePie3D(XMLWriter $objWriter, Pie3D $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:pie3DChart
         $objWriter->startElement('c:pie3DChart');
@@ -1544,7 +1553,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1691,8 +1700,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter XML Writer
      * @param Line $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeLine(XMLWriter $objWriter, Line $subject, bool $includeSheet = false): void
+    protected function writeTypeLine(XMLWriter $objWriter, Line $subject, bool $includeSheet = false, int &$seriesIndex=0): void
     {
         // c:lineChart
         $objWriter->startElement('c:lineChart');
@@ -1702,8 +1712,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->writeAttribute('val', 'standard');
         $objWriter->endElement();
 
-        // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -1860,8 +1869,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter XML Writer
      * @param Radar $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeRadar(XMLWriter $objWriter, Radar $subject, bool $includeSheet = false): void
+    protected function writeTypeRadar(XMLWriter $objWriter, Radar $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:scatterChart
         $objWriter->startElement('c:radarChart');
@@ -1877,7 +1887,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
@@ -2031,8 +2041,9 @@ class PptCharts extends AbstractDecoratorWriter
      * @param XMLWriter $objWriter
      * @param Scatter $subject
      * @param bool $includeSheet
+     * @param int $seriesIndex
      */
-    protected function writeTypeScatter(XMLWriter $objWriter, Scatter $subject, bool $includeSheet = false): void
+    protected function writeTypeScatter(XMLWriter $objWriter, Scatter $subject, bool $includeSheet = false,int $seriesIndex=0): void
     {
         // c:scatterChart
         $objWriter->startElement('c:scatterChart');
@@ -2048,7 +2059,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
 
         // Write series
-        $seriesIndex = 0;
+
         foreach ($subject->getSeries() as $series) {
             // c:ser
             $objWriter->startElement('c:ser');
