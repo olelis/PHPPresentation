@@ -48,6 +48,12 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class PptCharts extends AbstractDecoratorWriter
 {
+    const AXIS_X_ID = '52743552';
+    const AXIS_Y_ID = '52749440';
+
+    const AXIS_X2_ID = '1500419296';
+    const AXIS_Y2_ID = '1500421216';
+
     /**
      * @throws FileRemoveException
      */
@@ -508,6 +514,11 @@ class PptCharts extends AbstractDecoratorWriter
         $this->writeLayout($objWriter, $subject);
 
         $seriesIndex=0;
+
+        $haveAxis=[
+            'primary' => false,
+            'secondary' => false,
+        ];
         // Write chart
         foreach ($subject->getTypes() as $chartType) {
             if ($chartType instanceof Area) {
@@ -532,17 +543,28 @@ class PptCharts extends AbstractDecoratorWriter
                 throw new UndefinedChartTypeException();
             }
 
-        }
-        $chartType = $subject->getType();
-        // Write X axis?
-        if ($chartType->hasAxisX()) {
-            $this->writeAxis($objWriter, $subject->getAxisX(), Chart\Axis::AXIS_X, $chartType);
+            /**
+             * We should add axis only once per type
+             */
+            $useSecondary=$chartType->isSecondaryAxis();
+            $axisType = $useSecondary ? 'secondary' : 'primary';
+
+            if (!$haveAxis[$axisType]) {
+
+                // Write X axis?
+                if ($chartType->hasAxisX()) {
+                    $this->writeAxis($objWriter, $useSecondary ? $subject->getAxisX2() : $subject->getAxisX(), Chart\Axis::AXIS_X, $chartType);
+                }
+
+                // Write Y axis?
+                if ($chartType->hasAxisY()) {
+                    $this->writeAxis($objWriter, $useSecondary ? $subject->getAxisY2():$subject->getAxisY(), Chart\Axis::AXIS_Y, $chartType);
+                }
+                $haveAxis[$axisType] = true;
+            }
+
         }
 
-        // Write Y axis?
-        if ($chartType->hasAxisY()) {
-            $this->writeAxis($objWriter, $subject->getAxisY(), Chart\Axis::AXIS_Y, $chartType);
-        }
         $objWriter->endElement();
     }
 
@@ -790,12 +812,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -999,12 +1021,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         // c:extLst
@@ -1192,12 +1214,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         // c:axId
@@ -1852,12 +1874,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -2024,12 +2046,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -2203,12 +2225,12 @@ class PptCharts extends AbstractDecoratorWriter
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_X2_ID : self::AXIS_X_ID);
         $objWriter->endElement();
 
         // c:axId
         $objWriter->startElement('c:axId');
-        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->writeAttribute('val', $subject->isSecondaryAxis() ? self::AXIS_Y2_ID : self::AXIS_Y_ID);
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -2299,16 +2321,18 @@ class PptCharts extends AbstractDecoratorWriter
             return;
         }
 
+        $useSecondaryAxis = $typeChart->isSecondaryAxis();
+
         if (Chart\Axis::AXIS_X == $typeAxis) {
             $mainElement = 'c:catAx';
-            $axIdVal = '52743552';
+            $axIdVal = $useSecondaryAxis ? self::AXIS_X2_ID : self::AXIS_X_ID;
             $axPosVal = 'b';
-            $crossAxVal = '52749440';
+            $crossAxVal = $useSecondaryAxis ? self::AXIS_Y2_ID : self::AXIS_Y_ID;
         } else {
             $mainElement = 'c:valAx';
-            $axIdVal = '52749440';
-            $axPosVal = 'l';
-            $crossAxVal = '52743552';
+            $axIdVal = $useSecondaryAxis ? self::AXIS_Y2_ID : self::AXIS_Y_ID;
+            $axPosVal = $useSecondaryAxis ? 'l' : 'r';
+            $crossAxVal = $useSecondaryAxis ? self::AXIS_X2_ID : self::AXIS_X_ID;
         }
 
         // $mainElement

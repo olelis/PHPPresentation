@@ -51,6 +51,20 @@ class PlotArea implements ComparableInterface
     private $axisY;
 
     /**
+     * Axis X(secondary)
+     *
+     * @var Axis
+     */
+    private $axisX2;
+
+    /**
+     * Axis Y (secondary)
+     *
+     * @var Axis
+     */
+    private $axisY2;
+
+    /**
      * OffsetX (as a fraction of the chart).
      *
      * @var float
@@ -82,12 +96,16 @@ class PlotArea implements ComparableInterface
     {
         $this->axisX = new Axis();
         $this->axisY = new Axis();
+        $this->axisX2 = new Axis();
+        $this->axisY2 = new Axis();
     }
 
     public function __clone()
     {
         $this->axisX = clone $this->axisX;
         $this->axisY = clone $this->axisY;
+        $this->axisX2 = clone $this->axisX2;
+        $this->axisY2 = clone $this->axisY2;
     }
 
     /**
@@ -152,6 +170,21 @@ class PlotArea implements ComparableInterface
     public function getAxisY(): Axis
     {
         return $this->axisY;
+    }
+    /**
+     * Get Axis X(secondary).
+     */
+    public function getAxisX2(): Axis
+    {
+        return $this->axisX2;
+    }
+
+    /**
+     * Get Axis Y(secondary).
+     */
+    public function getAxisY2(): Axis
+    {
+        return $this->axisY2;
     }
 
     /**
@@ -237,7 +270,7 @@ class PlotArea implements ComparableInterface
      */
     public function getHashCode(): string
     {
-        return md5((is_null($this->type) ? 'null' : $this->type[0]->getHashCode()) . $this->axisX->getHashCode() . $this->axisY->getHashCode() . $this->offsetX . $this->offsetY . $this->width . $this->height . __CLASS__);
+        return md5((is_null($this->type) ? 'null' : $this->type[0]->getHashCode()) . $this->axisX->getHashCode() . $this->axisY->getHashCode().$this->axisX2->getHashCode() . $this->axisY2->getHashCode() . $this->offsetX . $this->offsetY . $this->width . $this->height . __CLASS__);
     }
 
     /**

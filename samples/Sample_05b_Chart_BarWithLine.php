@@ -88,6 +88,78 @@ $lineChart->addSeries($series);
 $shape->getPlotArea()->addType($lineChart);
 
 
+// Create templated slide
+echo EOL . date('H:i:s') . ' Create templated slide' . EOL;
+$currentSlide = createTemplatedSlide($objPHPPresentation);
+
+
+// Create a shape (chart)
+echo date('H:i:s') . ' Create a shape (chart)' . EOL;
+$shape = $currentSlide->createChartShape();
+$shape->setName('PHPPresentation Monthly Downloads')
+    ->setResizeProportional(false)
+    ->setHeight(550)
+    ->setWidth(700)
+    ->setOffsetX(120)
+    ->setOffsetY(80)
+    ->setIncludeSpreadsheet(true);
+$shape->getShadow()->setVisible(true)
+    ->setDirection(45)
+    ->setDistance(10);
+$shape->getFill()->setFillType(Fill::FILL_GRADIENT_LINEAR)
+    ->setStartColor(new Color('FFCCCCCC'))
+    ->setEndColor(new Color('FFFFFFFF'))
+    ->setRotation(270);
+$shape->getBorder()->setLineStyle(Border::LINE_SINGLE);
+$shape->getTitle()->setText('PHPPresentation Monthly Downloads');
+$shape->getTitle()->getFont()->setItalic(true);
+$shape->getPlotArea()->getAxisX()->setTitle('Month');
+$shape->getPlotArea()->getAxisY()->setTitle('Downloads');
+$shape->getPlotArea()->getAxisX2()->setTitle('')->setIsVisible(false);
+$shape->getPlotArea()->getAxisY2()
+    ->setTitle('')
+    ->setTickLabelPosition(\PhpOffice\PhpPresentation\Shape\Chart\Axis::TICK_LABEL_POSITION_HIGH)
+/*    ->setMinBounds(0)
+    ->setMaxBounds(2)*/
+;
+
+$shape->getLegend()->getBorder()->setLineStyle(Border::LINE_SINGLE);
+$shape->getLegend()->getFont()->setItalic(true);
+
+// Add line chart
+// Create a line chart (that should be inserted in a shape)
+echo date('H:i:s') . ' Create a line chart (that should be inserted in a chart shape)' . EOL;
+$lineChart = new \PhpOffice\PhpPresentation\Shape\Chart\Type\Line();
+$series = new Series('Downloads', $series1Data);
+$series->setShowSeriesName(false);
+$series->setShowValue(true);
+$lineChart->addSeries($series);
+
+$series = new Series('Downloads', $series2Data);
+$series->setShowSeriesName(false);
+$series->setShowValue(true);
+$lineChart->addSeries($series);
+
+$shape->getPlotArea()->addType($lineChart);
+
+// Add second axis chart
+// Create a line chart (that should be inserted in a shape)
+echo date('H:i:s') . ' Create a line chart (that should be inserted in a chart shape)' . EOL;
+$lineChart = new \PhpOffice\PhpPresentation\Shape\Chart\Type\Line();
+
+$seriesDiff = ['Jan' => 100, 'Feb' => 50, 'Mar' => 60, 'Apr' => 70, 'May' => 80, 'Jun' => 90, 'Jul' => 20, 'Aug' => 50, 'Sep' => 60, 'Oct' => 30, 'Nov' => 40, 'Dec' => 120];
+/*foreach($seriesDiff as $key => $value){
+    $seriesDiff[$key]= $value/100;
+}*/
+$series = new Series('Compared to prev year', $seriesDiff);
+$series->setShowSeriesName(false);
+$series->setShowValue(true);
+$lineChart->addSeries($series);
+$lineChart->setSecondaryAxis(true);
+
+$shape->getPlotArea()->addType($lineChart);
+
+
 // Save file
 echo write($objPHPPresentation, basename(__FILE__, '.php'), $writers);
 

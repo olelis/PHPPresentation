@@ -43,6 +43,13 @@ abstract class AbstractType implements ComparableInterface
     protected $hasAxisY = true;
 
     /**
+     * Use primary or secondary axis
+     *
+     * @var bool
+     */
+    protected $useSecondaryAxis = false;
+
+    /**
      * Hash index.
      *
      * @var int
@@ -120,6 +127,21 @@ abstract class AbstractType implements ComparableInterface
     public function getSeries(): array
     {
         return $this->series;
+    }
+
+    /**
+     * Should we use primary or secondary axis
+     *
+     * @return bool
+     */
+    public function isSecondaryAxis(): bool
+    {
+        return $this->useSecondaryAxis;
+    }
+
+    public function setSecondaryAxis(bool $useSecondary): void
+    {
+        $this->useSecondaryAxis = $useSecondary;
     }
 
     /**
