@@ -53,6 +53,14 @@ class Series implements ComparableInterface
     protected $DlblNumFormat = '';
 
     /**
+     * Data Number Format.
+     *
+     * @var string
+     */
+    protected $formatCode = '';
+
+
+    /**
      * @var string|null
      */
     protected $separator;
@@ -205,6 +213,30 @@ class Series implements ComparableInterface
         return $this;
     }
 
+
+    /**
+     * Get Format Code.
+     *
+     * @return string
+     */
+    public function getFormatCode(): string
+    {
+        return $this->formatCode;
+    }
+
+    /**
+     * Set Format Code.
+     *
+     * @param string $value
+     *
+     * @return self
+     */
+    public function setFormatCode(string $value = ''): self
+    {
+        $this->formatCode = $value;
+
+        return $this;
+    }
     /**
      * @return Fill
      */

@@ -148,16 +148,19 @@ echo date('H:i:s') . ' Create a line chart (that should be inserted in a chart s
 $lineChart = new \PhpOffice\PhpPresentation\Shape\Chart\Type\Line();
 
 $seriesDiff = ['Jan' => 100, 'Feb' => 50, 'Mar' => 60, 'Apr' => 70, 'May' => 80, 'Jun' => 90, 'Jul' => 20, 'Aug' => 50, 'Sep' => 60, 'Oct' => 30, 'Nov' => 40, 'Dec' => 120];
-/*foreach($seriesDiff as $key => $value){
+foreach($seriesDiff as $key => $value){
     $seriesDiff[$key]= $value/100;
-}*/
+}
 $series = new Series('Compared to prev year', $seriesDiff);
 $series->setShowSeriesName(false);
 $series->setShowValue(true);
+
+$series->setFormatCode('0%');
 $lineChart->addSeries($series);
 $lineChart->setSecondaryAxis(true);
 
 $shape->getPlotArea()->addType($lineChart);
+$shape->getPlotArea()->getAxisX2()->setFormatCode('0%');
 
 
 // Save file
