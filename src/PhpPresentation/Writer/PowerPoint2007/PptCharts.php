@@ -1775,6 +1775,15 @@ class PptCharts extends AbstractDecoratorWriter
             // c:dLbls
             $objWriter->startElement('c:dLbls');
 
+            if ($series->hasDlblNumFormat()) {
+                //c:numFmt
+                $objWriter->startElement('c:numFmt');
+                $objWriter->writeAttribute('formatCode', $series->getDlblNumFormat());
+                $objWriter->writeAttribute('sourceLinked', '0');
+                $objWriter->endElement();
+            }
+
+
             // c:txPr
             $objWriter->startElement('c:txPr');
 
@@ -2486,7 +2495,7 @@ class PptCharts extends AbstractDecoratorWriter
         // c:numFmt
         $objWriter->startElement('c:numFmt');
         $objWriter->writeAttribute('formatCode', $oAxis->getFormatCode());
-        $objWriter->writeAttribute('sourceLinked', '1');
+        $objWriter->writeAttribute('sourceLinked', $oAxis->getFormatCode() != '' ? '0' : '1');
         $objWriter->endElement();
 
         // c:majorTickMark

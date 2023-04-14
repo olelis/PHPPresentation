@@ -101,8 +101,8 @@ $shape->setName('PHPPresentation Monthly Downloads')
     ->setHeight(550)
     ->setWidth(700)
     ->setOffsetX(120)
-    ->setOffsetY(80)
-    ->setIncludeSpreadsheet(true);
+    ->setOffsetY(80);
+    // ->setIncludeSpreadsheet(true);
 $shape->getShadow()->setVisible(true)
     ->setDirection(45)
     ->setDistance(10);
@@ -155,12 +155,13 @@ $series = new Series('Compared to prev year', $seriesDiff);
 $series->setShowSeriesName(false);
 $series->setShowValue(true);
 
+$series->setDlblNumFormat('0%');
 $series->setFormatCode('0%');
 $lineChart->addSeries($series);
 $lineChart->setSecondaryAxis(true);
 
 $shape->getPlotArea()->addType($lineChart);
-$shape->getPlotArea()->getAxisX2()->setFormatCode('0%');
+$shape->getPlotArea()->getAxisY2()->setFormatCode('0%');
 
 
 // Save file
