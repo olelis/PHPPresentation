@@ -2504,6 +2504,51 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->writeAttribute('val', $oAxis->getTickLabelPosition());
         $objWriter->endElement();
 
+        // c:txPr
+        $objWriter->startElement('c:txPr');
+
+        // a:bodyPr
+        $objWriter->writeElement('a:bodyPr', null);
+
+        // a:lstStyle
+        $objWriter->writeElement('a:lstStyle', null);
+
+        // a:p
+        $objWriter->startElement('a:p');
+
+        // a:pPr
+        $objWriter->startElement('a:pPr');
+
+        // a:defRPr
+        $objWriter->startElement('a:defRPr');
+
+        $objWriter->writeAttribute('b', ($oAxis->getFont()->isBold() ? 'true' : 'false'));
+        $objWriter->writeAttribute('i', ($oAxis->getFont()->isItalic() ? 'true' : 'false'));
+        $objWriter->writeAttribute('strike', ($oAxis->getFont()->isStrikethrough() ? 'sngStrike' : 'noStrike'));
+        $objWriter->writeAttribute('sz', ($oAxis->getFont()->getSize() * 100));
+        $objWriter->writeAttribute('u', $oAxis->getFont()->getUnderline());
+        $objWriter->writeAttributeIf($oAxis->getFont()->isSuperScript(), 'baseline', '300000');
+        $objWriter->writeAttributeIf($oAxis->getFont()->isSubScript(), 'baseline', '-250000');
+
+        // ## a:defRPr
+        $objWriter->endElement();
+
+        // ## a:pPr
+        $objWriter->endElement();
+
+        // a:endParaRPr
+        $objWriter->startElement('a:endParaRPr');
+        $objWriter->writeAttribute('lang', 'en-US');
+        $objWriter->endElement();
+
+        // ## a:p
+        $objWriter->endElement();
+
+        // ## c:txPr
+        $objWriter->endElement();
+
+
+
         // c:spPr
         $objWriter->startElement('c:spPr');
         // Outline

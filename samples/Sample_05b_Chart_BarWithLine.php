@@ -50,8 +50,7 @@ $shape->setName('PHPPresentation Monthly Downloads')
     ->setHeight(550)
     ->setWidth(700)
     ->setOffsetX(120)
-    ->setOffsetY(80)
-    ->setIncludeSpreadsheet(true);
+    ->setOffsetY(80);
 $shape->getShadow()->setVisible(true)
     ->setDirection(45)
     ->setDistance(10);
@@ -63,6 +62,7 @@ $shape->getBorder()->setLineStyle(Border::LINE_SINGLE);
 $shape->getTitle()->setText('PHPPresentation Monthly Downloads');
 $shape->getTitle()->getFont()->setItalic(true);
 $shape->getPlotArea()->getAxisX()->setTitle('Month');
+$shape->getPlotArea()->getAxisX()->getFont()->setSize(5);
 $shape->getPlotArea()->getAxisY()->setTitle('Downloads');
 $shape->getPlotArea()->setType($bar);
 $shape->getView3D()->setRightAngleAxes(true);
