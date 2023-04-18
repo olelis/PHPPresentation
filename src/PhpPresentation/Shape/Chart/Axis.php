@@ -119,7 +119,21 @@ class Axis implements ComparableInterface
      */
     protected $isVisible = true;
 
-    /**
+
+    protected $displayUnits=null;
+
+    protected $displayUnitsLabel=false;
+
+    public const DISPLAY_UNIT_MILLION='millions';
+    public const DISPLAY_UNIT_10000='tenThousands';
+    public const DISPLAY_UNIT_10MILLION='tenMillions';
+    public const DISPLAY_UNIT_HUNDREDS='hundreds';
+    public const DISPLAY_UNIT_TRILLIONS='trillions';
+    public const DISPLAY_UNIT_BILLIONS='billions';
+    public const DISPLAY_UNIT_100MILLIONS='hundredMillions';
+    public const DISPLAY_UNIT_100THOUSANDS='hundredThousands';
+
+/**
      * Create a new \PhpOffice\PhpPresentation\Shape\Chart\Axis instance.
      *
      * @param string $title Title
@@ -489,4 +503,53 @@ class Axis implements ComparableInterface
 
         return $this;
     }
+
+
+    /**
+     * Display units format
+     *
+     * @return string|null
+     */
+    public function getDisplayUnitFormat(): ?string
+    {
+        return $this->displayUnits;
+    }
+
+    /**
+     * Display units format
+     *
+     * @param string|int $value
+     *
+     * @return self
+     */
+    public function setDisplayUnitsFormat(string $value): self
+    {
+        $this->displayUnits = $value;
+
+        return $this;
+    }
+
+    /**
+     * Display units format
+     *
+     * @return bool
+     */
+    public function isDisplayUnitsFormatLabel(): bool
+    {
+        return $this->displayUnitsLabel;
+    }
+    /**
+     * Do we need to display units format label
+     *
+     * @param bool $value
+     *
+     * @return self
+     */
+    public function setDisplayUnitsFormatLabel(bool $value=true): self
+    {
+        $this->displayUnitsLabel = $value;
+
+        return $this;
+    }
+
 }
