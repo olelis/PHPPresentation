@@ -1766,6 +1766,13 @@ class PptCharts extends AbstractDecoratorWriter
             $this->writeFill($objWriter, $series->getFill());
             // Write outline
             $this->writeOutline($objWriter, $series->getOutline());
+
+            // Write line color
+            $objWriter->startElement('a:ln');
+            $this->writeFill($objWriter, $series->getFill());
+
+            $objWriter->endElement();
+
             // ## c:spPr
             $objWriter->endElement();
 
